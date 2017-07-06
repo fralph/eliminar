@@ -7,6 +7,7 @@ import com.google.gwt.event.dom.client.BlurEvent;
 import com.google.gwt.event.dom.client.BlurHandler;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.FocusPanel;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.TextArea;
@@ -27,7 +28,8 @@ public class CriterionLevel extends VerticalPanel{
 	}-*/;
 
 	public boolean clicked = false;
-	private TextArea ta = null;;
+	private TextArea ta = null;
+	private Button removeLevelButton = null;
 	private Label lbl = null;
 	private Label lbles = null;
 	private FocusPanel fs = null;
@@ -39,6 +41,7 @@ public class CriterionLevel extends VerticalPanel{
 		lbl = new Label("level");
 		lbles = new Label("level");
 		fs = new FocusPanel();
+		removeLevelButton = new Button("Remove");
 		fs.setStylePrimaryName("level");
 		lbl.setStylePrimaryName("leveltext");
 		ta.setStylePrimaryName("leveltextbox");
@@ -71,7 +74,17 @@ public class CriterionLevel extends VerticalPanel{
 				}	
 			}
 		});
+		
+		removeLevelButton.addClickHandler(new ClickHandler() {
+			
+			@Override
+			public void onClick(ClickEvent event) {
+				// TODO Auto-generated method stub
+				removeFromParent();
+			}
+		});
+		
 		add(fs);
-		add(lbles);
+		add(removeLevelButton);
 	}
 }

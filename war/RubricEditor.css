@@ -47,3 +47,9 @@ h1 {
 .leveltext{
 	text-align: center;
 }
+.button-hide{
+	display: none;
+}
+.button-show{
+	display: block;
+}
