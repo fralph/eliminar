@@ -3,6 +3,9 @@
  */
 package online.escribiendo.rubricEditor.client;
 
+import java.util.List;
+import java.util.Map;
+
 import com.google.gwt.event.dom.client.BlurEvent;
 import com.google.gwt.event.dom.client.BlurHandler;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -33,14 +36,16 @@ public class CriterionLevel extends VerticalPanel{
 	private Label lbl = null;
 	private Label lbles = null;
 	private FocusPanel fs = null;
+	private int id= 0;
+	private String  definition = null;
+	private int score = 0;
 
-	public CriterionLevel() {
-
+	public CriterionLevel(String id, String definition, String score) {
 		
 		ta = new TextArea();
 		lbl = new Label("level");
-		lbles = new Label("level");
 		fs = new FocusPanel();
+		lbl.setText(definition);
 		removeLevelButton = new Button("Remove");
 		fs.setStylePrimaryName("level");
 		lbl.setStylePrimaryName("leveltext");
@@ -87,4 +92,6 @@ public class CriterionLevel extends VerticalPanel{
 		add(fs);
 		add(removeLevelButton);
 	}
+
+	
 }
