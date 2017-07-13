@@ -8,15 +8,10 @@ import java.util.logging.Logger;
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Button;
-import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.user.client.ui.VerticalPanel;
-
-import online.escribiendo.rubricEditor.client.AjaxData;
-import online.escribiendo.rubricEditor.client.AjaxRequest;
 
 /**
  * Entry point classes define <code>onModuleLoad()</code>.
@@ -32,6 +27,7 @@ public class RubricEditor implements EntryPoint {
 	private String params = null;
 	private String criterionId = null;
 	private String criterionDefinition = null;
+
 	
 	/** Ajax url **/
 	private String moodleurl = "http://localhost:80/mod/emarking/activities/ajax/data.php";
@@ -61,7 +57,7 @@ public class RubricEditor implements EntryPoint {
 					List<Map<String, String>> levels = AjaxRequest.getValuesFromResultString(criteria.get("levels"));
 					criterionId=criteria.get("id");
 					criterionDefinition=criteria.get("definition");
-					criterion = new Criterion(criterionId,criterionDefinition,levels,defaultNumLevels,false,false);
+					criterion = new Criterion(criterionId,criterionDefinition,levels,0,needUpButton());
 					checkVpIndex();
 					vp.add(criterion);
 				
@@ -73,10 +69,10 @@ public class RubricEditor implements EntryPoint {
 			@Override
 			public void onClick(ClickEvent event) {
 				
-				criterion = new Criterion(null,null,null ,defaultNumLevels,needUpButton(),false);
+				criterion = new Criterion(null,null,null ,defaultNumLevels,needUpButton());
 				checkVpIndex();
 				vp.add(criterion);
-				//console(vp.getWidgetIndex(criterion));
+				
 			}
 		});
 		
@@ -172,8 +168,5 @@ public class RubricEditor implements EntryPoint {
 		return (vp.getWidgetCount() > 1);
 	}
 	
-	private boolean needDownButton(){
-		return (vp.getWidgetCount() > 1 );
-	}
 
 }

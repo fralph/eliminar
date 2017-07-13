@@ -3,11 +3,6 @@
  */
 package online.escribiendo.rubricEditor.client;
 
-import java.util.List;
-import java.util.Map;
-
-import com.google.gwt.event.dom.client.BlurEvent;
-import com.google.gwt.event.dom.client.BlurHandler;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.ui.Button;
@@ -15,6 +10,7 @@ import com.google.gwt.user.client.ui.FocusPanel;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.TextArea;
 import com.google.gwt.user.client.ui.VerticalPanel;
+
 
 /**
  * @author francisco ralph
@@ -33,64 +29,41 @@ public class CriterionLevel extends VerticalPanel{
 	public boolean clicked = false;
 	private TextArea ta = null;
 	private Button removeLevelButton = null;
-	private Label lbl = null;
-	private Label lbles = null;
-	private FocusPanel fs = null;
+	private Label levelDefinition = null;
+	private FocusPanel fp = null;
 	private int id= 0;
 	private String  definition = null;
-	private int score = 0;
+	private Label title = null;
+	public int score = 0;
 
-	public CriterionLevel(String id, String definition, String score) {
-		
-		ta = new TextArea();
-		lbl = new Label("level");
-		fs = new FocusPanel();
-		lbl.setText(definition);
+	public CriterionLevel(int id, String definition, int levelCount) {
 		removeLevelButton = new Button("Remove");
-		fs.setStylePrimaryName("level");
-		lbl.setStylePrimaryName("leveltext");
-		ta.setStylePrimaryName("leveltextbox");
-		
-		fs.add(lbl);
-		fs.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				// TODO Auto-generated method stub
-				if(clicked == false){
-					fs.remove(lbl);
-					ta.setText(lbl.getText());
-					fs.add(ta);
-					ta.selectAll();
-					ta.setFocus(true);
-					clicked = true;		
-				}	
-			}
-		});
-
-		ta.addBlurHandler(new BlurHandler() {
-			@Override
-			public void onBlur(BlurEvent event) {
-				// TODO Auto-generated method stub
-				if(clicked == true){
-					fs.remove(ta);
-					lbl.setText(ta.getText());
-					fs.add(lbl);	
-					clicked = false;
-				}	
-			}
-		});
-		
+		title = new Label("Nivel "+levelCount);
+		TextEditor te = new TextEditor(definition,"text"); 
 		removeLevelButton.addClickHandler(new ClickHandler() {
-			
 			@Override
 			public void onClick(ClickEvent event) {
 				// TODO Auto-generated method stub
-				removeFromParent();
+				Criterion.removeLevelFromCriterion(getCriterionLevel());
 			}
 		});
 		
-		add(fs);
+		add(title);
+		add(te);
 		add(removeLevelButton);
+		
+		
+	}
+	public CriterionLevel getCriterionLevel(){
+		return this;
+	}
+	public void updateLevelScore(int score){
+		this.score= score;
+		title.setText("Nivel " + score);
+		
+	}
+	public void addDescription(){
+		
 	}
 
 	
