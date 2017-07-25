@@ -27,10 +27,11 @@ public class RubricEditor implements EntryPoint {
 	private String params = null;
 	private String criterionId = null;
 	private String criterionDefinition = null;
+	public static int   rubricid= 1;
 
 	
 	/** Ajax url **/
-	private String moodleurl = "http://localhost:80/mod/emarking/activities/ajax/data.php";
+	public static String moodleurl = "http://localhost:80/mod/emarking/activities/ajax/data.php";
 
 
 	public static native void console(String text)
@@ -41,7 +42,7 @@ public class RubricEditor implements EntryPoint {
 	public void onModuleLoad() {
 		final Button addCriteriaButton = new Button("Add Criteria");
 		AjaxRequest.moodleUrl = moodleurl;
-		params="action=getRubric&rubricid=1";
+		params="action=getRubric&rubricid=" + rubricid;
 		AjaxRequest.ajaxRequest(params, new AsyncCallback<AjaxData>() {
 			@Override
 			public void onFailure(Throwable caught) {
@@ -69,10 +70,28 @@ public class RubricEditor implements EntryPoint {
 			@Override
 			public void onClick(ClickEvent event) {
 				
-				criterion = new Criterion(null,null,null ,defaultNumLevels,needUpButton());
-				checkVpIndex();
-				vp.add(criterion);
-				
+				params="action=createCriterion&rubricid=" + rubricid;
+				AjaxRequest.ajaxRequest(params, new AsyncCallback<AjaxData>() {
+					@Override
+					public void onFailure(Throwable caught) {
+						console(caught.toString());
+						logger.warning("Failure on heartbeat");			
+					}
+					
+					@Override
+					public void onSuccess(AjaxData result) {
+						List<Map<String, String>> values = AjaxRequest.getValuesFromResult(result);
+						for(Map<String, String> criteria : values) {
+							List<Map<String, String>> levels = AjaxRequest.getValuesFromResultString(criteria.get("levels"));
+							criterionId=criteria.get("id");
+							criterionDefinition=criteria.get("definition");
+							criterion = new Criterion(criterionId,criterionDefinition,levels,0,needUpButton());
+							checkVpIndex();
+							vp.add(criterion);
+						
+						}		
+					}			
+				});
 			}
 		});
 		
@@ -144,16 +163,31 @@ public class RubricEditor implements EntryPoint {
 		}
 		
 	}
-	public static void removeCriterion(Criterion cr) {
-		cr.removeFromParent();
+	public static void removeCriterion(final Criterion cr) {
 		
-		Criterion firstCriterion = (Criterion) vp.getWidget(1);
-		
-		int lastVPIndex= getTotalChilds() - 1;
-		Criterion lastCriterion = (Criterion) vp.getWidget(lastVPIndex);
-		
-		Criterion.removeUpButton(firstCriterion);
-		Criterion.removeDownButton(lastCriterion);
+		AjaxRequest.moodleUrl =RubricEditor.moodleurl;
+		String params="action=removeCriterion&criterionid=" + cr.id;
+		AjaxRequest.ajaxRequest(params, new AsyncCallback<AjaxData>() {
+			@Override
+			public void onFailure(Throwable caught) {
+				console(caught.toString());
+				logger.warning("Failure on heartbeat");			
+			}
+			
+			@Override
+			public void onSuccess(AjaxData result) {
+				Map<String, String> value = AjaxRequest.getValueFromResult(result);
+				console(value.toString());
+				cr.removeFromParent();
+				Criterion firstCriterion = (Criterion) vp.getWidget(1);
+				
+				int lastVPIndex= getTotalChilds() - 1;
+				Criterion lastCriterion = (Criterion) vp.getWidget(lastVPIndex);
+				
+				Criterion.removeUpButton(firstCriterion);
+				Criterion.removeDownButton(lastCriterion);
+			}			
+		});
 	}
 	
 	public static int getTotalChilds(){

@@ -13,6 +13,7 @@ public class TextEditor extends FocusPanel{
 	public boolean clicked = false;
 	private TextArea ta = null;
 	private Label levelDefinition = null;
+	public boolean isCriterion = false;
 	
 	public TextEditor(String text, String type){
 		ta = new TextArea();
@@ -49,12 +50,21 @@ public class TextEditor extends FocusPanel{
 				// TODO Auto-generated method stub
 				if(clicked == true){
 					remove(ta);
-					levelDefinition.setText(ta.getText().replaceAll("\n", "<br>"));
+					String text = ta.getText().replaceAll("\n", "<br>");
+					levelDefinition.setText(text);
 					add(levelDefinition);	
 					clicked = false;
+					if(isCriterion){
+					Criterion.updateCriterionText(text, getTextEditor());
+					}else{
+					CriterionLevel.updateLevelText(text, getTextEditor());
+					}
 				}	
 			}
 		});
 	}
 
+	public TextEditor getTextEditor(){
+		return this;
+	}
 }

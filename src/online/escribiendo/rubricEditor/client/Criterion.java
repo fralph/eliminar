@@ -2,14 +2,17 @@ package online.escribiendo.rubricEditor.client;
 
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Logger;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.VerticalPanel;
 
 public class Criterion extends HorizontalPanel {
+	private static Logger logger = Logger.getLogger("");
 
 	private static  Button addLevelButton = null;
 	private static Button removeCriterionButton = null;
@@ -20,7 +23,7 @@ public class Criterion extends HorizontalPanel {
 	private int index = 0;
 	private boolean haveDownButton = false;
 	private int firstPanelPosition = 2;
-	private int id = 0;
+	public int id = 0;
 	private String definition = "Criterio";
 	private int levelCount = 1;
 
@@ -41,9 +44,27 @@ public class Criterion extends HorizontalPanel {
 			@Override
 			public void onClick(ClickEvent event) {
 				// TODO Auto-generated method stub
-				CriterionLevel level = new CriterionLevel(0,null,levelCount);
-				levelCount++;
-				insert(level, firstPanelPosition);
+				
+				AjaxRequest.moodleUrl =RubricEditor.moodleurl;
+				String params="action=createLevel&criterionid=" + id;
+				AjaxRequest.ajaxRequest(params, new AsyncCallback<AjaxData>() {
+					@Override
+					public void onFailure(Throwable caught) {
+						console(caught.toString());
+						logger.warning("Failure on heartbeat");			
+					}
+					
+					@Override
+					public void onSuccess(AjaxData result) {
+						Map<String, String> value = AjaxRequest.getValueFromResult(result);
+						
+						CriterionLevel level = new CriterionLevel(Integer.parseInt(value.get("id")),value.get("definition"),levelCount);
+						levelCount++;
+						insert(level, firstPanelPosition);
+					}			
+				});
+				
+				
 				
 			}
 		});
@@ -87,12 +108,12 @@ public class Criterion extends HorizontalPanel {
 		}
 			VerticalPanel vpc = new VerticalPanel();
 			TextEditor te = new TextEditor(this.definition,"text");
+			te.isCriterion = true;
 			TextEditor ted = new TextEditor("Descripción (opcional)","description");
 			vpc.add(te);
 			vpc.add(ted);
 			insert(vpc, 1);
 	
-		if(levels != null){
 		for(Map<String, String> levelData : levels) {
 			String levelId= levelData.get("id");
 			String levelDefinition= levelData.get("definition");
@@ -102,13 +123,8 @@ public class Criterion extends HorizontalPanel {
 			add(level);
 			levelCount++;
 		}
-		}
-		for (int j = 0; j < defaultNumLevels; j++) {
-			CriterionLevel level = new CriterionLevel(0,null,levelCount);
-			insert(level,firstPanelPosition);
-			levelCount++;
 		
-		}
+
 		lastCriterion=Criterion.this;
 	}
 	
@@ -139,20 +155,55 @@ public class Criterion extends HorizontalPanel {
 		btn.setStylePrimaryName("button-hide");
 	}
 
-	public static void removeLevelFromCriterion(CriterionLevel criterionLevel){
+	public static void removeLevelFromCriterion(final CriterionLevel criterionLevel){
 	
-		Criterion cr = (Criterion) criterionLevel.getParent();
-		int removedIndex = cr.getWidgetIndex(criterionLevel);
-		criterionLevel.removeFromParent();
-		cr.levelCount--;
 		
-		for (int i = removedIndex -1; i > 1; i--) {
-
-			CriterionLevel cl =(CriterionLevel) cr.getWidget(i);
-			int newIndex= cl.score - 1;
-			cl.updateLevelScore(newIndex);
-		}
+		AjaxRequest.moodleUrl =RubricEditor.moodleurl;
+		String params="action=removeLevel&levelid=" + criterionLevel.id;
+		AjaxRequest.ajaxRequest(params, new AsyncCallback<AjaxData>() {
+			@Override
+			public void onFailure(Throwable caught) {
+				console(caught.toString());
+				logger.warning("Failure on heartbeat");			
+			}
+			
+			@Override
+			public void onSuccess(AjaxData result) {
+				Map<String, String> value = AjaxRequest.getValueFromResult(result);
+				console(value.toString());
+				Criterion cr = (Criterion) criterionLevel.getParent();
+				int removedIndex = cr.getWidgetIndex(criterionLevel);
+				criterionLevel.removeFromParent();
+				cr.levelCount--;
+				
+				for (int i = removedIndex -1; i > 1; i--) {
+					CriterionLevel cl =(CriterionLevel) cr.getWidget(i);
+					int newIndex= cl.score - 1;
+					cl.updateLevelScore(newIndex);
+				}
+				
+			}			
+		});
 		
+	}
+	public static void updateCriterionText(String text, TextEditor textEditor) {
+		// TODO Auto-generated method stub
+				Criterion cr = (Criterion) textEditor.getParent().getParent();
+				AjaxRequest.moodleUrl =RubricEditor.moodleurl;
+				String params="action=updateCriterionText&criterionid=" + cr.id + "&criteriontext=" + text;
+				AjaxRequest.ajaxRequest(params, new AsyncCallback<AjaxData>() {
+					@Override
+					public void onFailure(Throwable caught) {
+						console(caught.toString());
+						logger.warning("Failure on heartbeat");			
+					}
+					
+					@Override
+					public void onSuccess(AjaxData result) {
+						Map<String, String> value = AjaxRequest.getValueFromResult(result);
+						console(value.toString());
+					}			
+				});
 	}
 
 }
