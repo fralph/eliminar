@@ -15,7 +15,7 @@ public class TextEditor extends FocusPanel{
 	private Label levelDefinition = null;
 	public boolean isCriterion = false;
 	
-	public TextEditor(String text, String type){
+	public TextEditor(final String text, String type){
 		ta = new TextArea();
 		levelDefinition = new Label("level");
 		levelDefinition.setText(text);
@@ -50,8 +50,8 @@ public class TextEditor extends FocusPanel{
 				// TODO Auto-generated method stub
 				if(clicked == true){
 					remove(ta);
-					String text = ta.getText().replaceAll("\n", "<br>");
-					levelDefinition.setText(text);
+					
+					levelDefinition.setText(ta.getText());
 					add(levelDefinition);	
 					clicked = false;
 					if(isCriterion){

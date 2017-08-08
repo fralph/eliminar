@@ -69,7 +69,6 @@ public class CriterionLevel extends VerticalPanel{
 	public void updateLevelScore(int score){
 		this.score= score;
 		title.setText("Nivel " + score);
-		
 	}
 
 	public static  void updateLevelText(String text, TextEditor textEditor) {

@@ -19,7 +19,7 @@ import com.google.gwt.user.client.ui.VerticalPanel;
 public class RubricEditor implements EntryPoint {
 
 	private static Logger logger = Logger.getLogger("");
-	
+
 	public final static VerticalPanel vp = new VerticalPanel();
 	private int count = 0;
 	private int defaultNumLevels = 3;
@@ -29,7 +29,7 @@ public class RubricEditor implements EntryPoint {
 	private String criterionDefinition = null;
 	public static int   rubricid= 1;
 
-	
+
 	/** Ajax url **/
 	public static String moodleurl = "http://localhost:80/mod/emarking/activities/ajax/data.php";
 
@@ -38,7 +38,7 @@ public class RubricEditor implements EntryPoint {
 	/*-{
     console.log(text);
 	}-*/;
-	
+
 	public void onModuleLoad() {
 		final Button addCriteriaButton = new Button("Add Criteria");
 		AjaxRequest.moodleUrl = moodleurl;
@@ -49,7 +49,7 @@ public class RubricEditor implements EntryPoint {
 				console(caught.toString());
 				logger.warning("Failure on heartbeat");			
 			}
-			
+
 			@Override
 			public void onSuccess(AjaxData result) {
 				vp.add(addCriteriaButton);
@@ -61,15 +61,15 @@ public class RubricEditor implements EntryPoint {
 					criterion = new Criterion(criterionId,criterionDefinition,levels,0,needUpButton());
 					checkVpIndex();
 					vp.add(criterion);
-				
+
 				}		
 			}			
 		});
-		
+
 		addCriteriaButton.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				
+
 				params="action=createCriterion&rubricid=" + rubricid;
 				AjaxRequest.ajaxRequest(params, new AsyncCallback<AjaxData>() {
 					@Override
@@ -77,7 +77,6 @@ public class RubricEditor implements EntryPoint {
 						console(caught.toString());
 						logger.warning("Failure on heartbeat");			
 					}
-					
 					@Override
 					public void onSuccess(AjaxData result) {
 						List<Map<String, String>> values = AjaxRequest.getValuesFromResult(result);
@@ -88,13 +87,13 @@ public class RubricEditor implements EntryPoint {
 							criterion = new Criterion(criterionId,criterionDefinition,levels,0,needUpButton());
 							checkVpIndex();
 							vp.add(criterion);
-						
+
 						}		
 					}			
 				});
 			}
 		});
-		
+
 		RootPanel.get().add(vp);
 	}
 	private void checkVpIndex(){
@@ -104,53 +103,78 @@ public class RubricEditor implements EntryPoint {
 			case 2:
 				Criterion firstCriterion = (Criterion) vp.getWidget(1);
 				Criterion.addDownButton(firstCriterion);
-
 				break;
 			case 3:
 				Criterion secondCriterion = (Criterion) vp.getWidget(2);
-				 Criterion.addDownButton(secondCriterion);
+				Criterion.addDownButton(secondCriterion);
 				break;
-				}
 			}
-			else{
-
-				int beforeIndex =getTotalChilds() - 1;
-				Criterion beforeCriterion = (Criterion) vp.getWidget(beforeIndex);
-				Criterion.addDownButton(beforeCriterion);
-			}
-		
-	}
-	public static void moveCriterionDown(Criterion cr) {
-		// TODO Auto-generated method stub
-		int criterionIndex=vp.getWidgetIndex(cr);
-		int totalChilds=getTotalChilds() - 1 ;
-		int newCriterionIndex = criterionIndex + 1;
-		
-		vp.remove(cr);
-		vp.insert(cr,newCriterionIndex);
-		
-		if(criterionIndex == 1){
-			Criterion beforeCriterion = (Criterion) vp.getWidget(criterionIndex);
-			Criterion.addUpButton(cr);
-			Criterion.removeUpButton(beforeCriterion);
 		}
-		if(newCriterionIndex == totalChilds){
-			Criterion.removeDownButton(cr);
-			Criterion beforeCriterion = (Criterion) vp.getWidget(criterionIndex);
+		else{
+			int beforeIndex =getTotalChilds() - 1;
+			Criterion beforeCriterion = (Criterion) vp.getWidget(beforeIndex);
 			Criterion.addDownButton(beforeCriterion);
 		}
-		
 	}
-	
-	public static void moveCriterionUp(Criterion cr) {
+	public static void moveCriterionDown(final Criterion cr) {
 		// TODO Auto-generated method stub
+		AjaxRequest.moodleUrl =RubricEditor.moodleurl;
+		String params="action=moveCriterionDown&criterionid=" + cr.id;
+		AjaxRequest.ajaxRequest(params, new AsyncCallback<AjaxData>() {
+			@Override
+			public void onFailure(Throwable caught) {
+				console(caught.toString());
+				logger.warning("Failure on heartbeat");			
+			}
+
+			@Override
+			public void onSuccess(AjaxData result) {
+
+				int criterionIndex=vp.getWidgetIndex(cr);
+				int totalChilds=getTotalChilds() - 1 ;
+				int newCriterionIndex = criterionIndex + 1;
+
+				vp.remove(cr);
+				vp.insert(cr,newCriterionIndex);
+
+				if(criterionIndex == 1){
+					Criterion beforeCriterion = (Criterion) vp.getWidget(criterionIndex);
+					Criterion.addUpButton(cr);
+					Criterion.removeUpButton(beforeCriterion);
+				}
+				if(newCriterionIndex == totalChilds){
+					Criterion.removeDownButton(cr);
+					Criterion beforeCriterion = (Criterion) vp.getWidget(criterionIndex);
+					Criterion.addDownButton(beforeCriterion);
+				}
+				
+			}
+
+		});
+
+	}
+
+	public static void moveCriterionUp(final Criterion cr) {
+		// TODO Auto-generated method stub
+				AjaxRequest.moodleUrl =RubricEditor.moodleurl;
+				String params="action=moveCriterionUp&criterionid=" + cr.id;
+				AjaxRequest.ajaxRequest(params, new AsyncCallback<AjaxData>() {
+					@Override
+					public void onFailure(Throwable caught) {
+						console(caught.toString());
+						logger.warning("Failure on heartbeat");			
+					}
+
+					@Override
+					public void onSuccess(AjaxData result) {
+		
 		int criterionIndex=vp.getWidgetIndex(cr);
 		int totalChilds=getTotalChilds() - 1;
 		int newCriterionIndex = criterionIndex - 1;
-		
+
 		vp.remove(cr);
 		vp.insert(cr,newCriterionIndex);
-		
+
 		if(newCriterionIndex == 1){
 			Criterion.removeUpButton(cr);
 			Criterion afterCriterion = (Criterion) vp.getWidget(criterionIndex);
@@ -161,10 +185,11 @@ public class RubricEditor implements EntryPoint {
 			Criterion afterCriterion = (Criterion) vp.getWidget(criterionIndex);
 			Criterion.removeDownButton(afterCriterion);
 		}
-		
+					}
+				});
 	}
 	public static void removeCriterion(final Criterion cr) {
-		
+
 		AjaxRequest.moodleUrl =RubricEditor.moodleurl;
 		String params="action=removeCriterion&criterionid=" + cr.id;
 		AjaxRequest.ajaxRequest(params, new AsyncCallback<AjaxData>() {
@@ -173,34 +198,34 @@ public class RubricEditor implements EntryPoint {
 				console(caught.toString());
 				logger.warning("Failure on heartbeat");			
 			}
-			
+
 			@Override
 			public void onSuccess(AjaxData result) {
 				Map<String, String> value = AjaxRequest.getValueFromResult(result);
 				console(value.toString());
 				cr.removeFromParent();
 				Criterion firstCriterion = (Criterion) vp.getWidget(1);
-				
+
 				int lastVPIndex= getTotalChilds() - 1;
 				Criterion lastCriterion = (Criterion) vp.getWidget(lastVPIndex);
-				
+
 				Criterion.removeUpButton(firstCriterion);
 				Criterion.removeDownButton(lastCriterion);
 			}			
 		});
 	}
-	
+
 	public static int getTotalChilds(){
 		return vp.getWidgetCount();
 	}
-	
+
 	public static int getChildIndex(Criterion cr){
 		return vp.getWidgetIndex(cr);
 	}
-	
+
 	private boolean needUpButton(){
 		return (vp.getWidgetCount() > 1);
 	}
-	
+
 
 }
